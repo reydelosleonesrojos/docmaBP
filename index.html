@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal DOCMA AI</title>
+    
+    <!-- Carga de Tailwind CSS para estilos -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Carga de React y ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    
+    <!-- Carga de Babel para compilar JSX en el navegador -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Carga de Iconos (Lucide) -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <style>
+        /* Pequeño ajuste para asegurar que el body ocupe todo el alto */
+        body, html { height: 100%; margin: 0; }
+        #root { height: 100%; }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- El script principal con tipo text/babel para que Babel lo procese -->
+    <script type="text/babel">
+        // Extraemos Hooks de React
+        const { useState, useRef, useEffect } = React;
+
+        // Definimos los iconos SVG de forma inline ya que no usamos el paquete npm lucide-react directamente
+        const IconBookOpen = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16 text-white mx-auto mb-4"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+        );
+        const IconLock = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-slate-400"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        );
+        const IconAlert = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-1"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
+        );
+        const IconMessage = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-blue-600"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
+        );
+        const IconSend = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 ml-1"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
+        );
+        const IconLoader = () => (
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 animate-spin"><line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y2="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/></svg>
+        );
+
+        const apiKey = ""; // La clave se inyectará automáticamente en el entorno
+
+        const DOCUMENT_CONTENT = `4.2 Creación de Emails
+  
+• Accede a los diferentes contenidos
+• Nombre de las creatividades email
+• Plantillas responsive
+• Duplicar/reutilizar creatividades
+• Colores accesibles
+• Componentes dinámicos de uso general
+• Nuevo logo Endesa (2025)
+• Cambios masivos en creatividades
+• RaiseError
+• Copias CC y BCC en activities Email
+• Actualización del código VML en emails para Outlook
+• Subject y Preheader
+• Saludo inicial
+• Header y Footer
+• Detalle del footer
+• Send Classification, Publication List y Footer
+• Leads – Creación y footer
+• Modo oscuro/noche – Imágenes
+• Evitar deformación por ancho - Imágenes
+• Texto Alternativo – Alt text
+• Tracking Alias
+                    
+¿Qué información vas a encontrar?
+Tendrás acceso a la información necesaria para crear un email, desde el nombre de este hasta las plantillas, los componentes y código AMPscript que puedes utilizar.
+También dispondrás de el detalle de los aspectos esenciales del email (Subject, Firma, etc,), aquellos aspectos técnicos que se necesita configurar en el journey (como Send Classification o Publication List), y las mejores prácticas para garantizar la accesibilidad y entregabilidad de los emails.
+  Plantillas AMPscript Publication List
+Accesibilidad
+Send Classification
+Footer
+    
+ Contenido relacionado
+Manual componentes dinámicos para email Manual Centro de Preferencias
+Ejemplos de journeys etiquetados (Tracking Alias)
+   1
+  Nombre de las creatividades email (1/2)
+A la hora de nombrar las diferentes creatividades relacionadas con activities de email del customer journey se deberá indicar al principio de las mismas el mismo código Sxxxxxx del journey al que pertenecen.
+Nomenclatura para la creatividad de email:
+[código Sxxxxxx]_[idioma]_[tipo de mercado]_[nombre creatividad]
+Ejemplo -> S003679_ES_ML_Cierre.favorable.solicitud
+2
+    Ejemplo
+Ejemplo
+
+ Nombre de las creatividades email (2/2)
+Además, el nombre de la activity debe ser el mismo que el de la creatividad asociada.
+Si un mismo mensaje tiene reimpacto, se deberá poner al final del nombre _REMINDER.
+Esto será cuando corresponda a la misma creatividad.
+Hubiera más de un reimpacto asociado, estos se podrán numerar: _REMINDER1, _REMINDER2...etc...
+Si el email de este ejemplo tuviera 2 reimpactos, la forma de nombrarlos sería:
+IMPACTO 1: S007008_FraccionamientoPagos_ES_ML_20210830
+PRIMER REIMPACTO: S007008_FraccionamientoPagos_ES_ML_20210830_REMINDER SEGUNDO REIMPACTO: S007008_FraccionamientoPagos_ES_ML_20210830_REMINDER2
+      3
+
+   Plantillas responsive
+UX ha facilitado plantillas responsive ya testadas para la creación de emails. UX ha preparado un sistema de plantillas modulares con diversas opciones al
+que deben ajustarse todas las comunicaciones.
+Tiene cada plantilla una cantidad máxima de módulos y se puede siempre
+eliminar alguna línea de bloques, pero nunca añadir más.
+En casos excepcionales, las comunicaciones podrán salirse de las plantillas ya establecidas para crear plantillas nuevas, pero siempre teniendo en consideración y respetando las guías de diseño.
+----
+Además de elegir una plantilla, es importante que el Template utilizado sea el apropiado. En las propiedades de nuestra creatividad debe elegirse:
+Para ML: MASTER-HYBRID - Simple
+Para MR: MR - MASTER-HYBRID - Simple
+IMPORTANTE
+Si algún constructor tiene la necesidad de crear una nueva Carpeta para temas propios, debe ser con un
+nombre totalmente diferente a los nombres que aparecen en estas Best Practices
+Localización en Marketing Cloud
+Elegir el Template correcto permitirá, por ejemplo, que al ver el email en web los clientes vean el nombre de la empresa (Endesa o Energía XXI) correctamente en el nombre de la pestaña del navegador.
+    4
+
+  Duplicar/reutilizar creatividades
+Las creatividades originales pueden estar desactualizadas y deben revisarse.
+Duplicar una creatividad usada en el pasado es una forma ágil de aprovechar el trabajo, pero deben revisarse en profundidad para detectar detalles desactualizado e incoherentes.
+• En solo un año, se han cambiado:
+• La operación de la empresa, separándola en dos.
+• El nombre de la web y sus url.
+• El footer estándar.
+• La paleta de colores (colores accesibles)
+• La firma/cierre de los emails.
+Son solo algunos ejemplos de una empresa en constante cambio.
+Cuando se duplica una creatividad, sobre todo si es antigua, revisar hasta el último detalle ayuda a que se coherente con la realidad actual de la compañía
+    5
+
+  Colores accesibles
+Esenciales para una correcta accesibilidad
+Tanto la Guía para comunicaciones por email de Endesa clientes compartida por UX (ATC) como las ADV (Advertising) Guidelines de Enel proponen una serie de colores accesibles.
+Es esencial su uso, pues la mejora en contraste facilita, no solo la accesibilidad a clientes con alguna dificultad visual, sino también garantiza una visualización correcta de los emails vistos en sistemas con modo oscuro.
+En los emails comerciales, el uso de colores accesibles de las ADV Guidelines debe seguirse, así como el resto de indicadiones de las ADV Guidelines.
+   Colores accesibles para emails comerciales en la columna After.
+6
+Colores accesibles indicados en Guía para comunicaciones por email de Endesa Clientes
+
+   Componentes dinámicos de uso general
+Componentes compartidos para facilitar el mantenimiento de creatividades.
+Se han creado componentes para uso global en comunicaciones, que facilitarán el mantenimiento/cambio de los mismos en el futuro. Todas las creatividades deben tomar los siguientes elementos de la carpeta 0 – LIBRARY:
+• Logo
+• Header
+• Encuesta
+• Cierre digitalización Área Cliente-App
+• Para registrados: “¡Accede!”.
+• Para no registrados: Cambiando “¡Accede!” por ”¡Regístrate!”
+• Y finalmente neutro, cuando no se conoce si está registrado: quitando “¡Accede!”
+• Cierre digitalización Factura Digital
+• Cierre de canales de atención
+• Firma
+• Footer
+IMPORTANTE
+Si algún constructor tiene la necesidad de crear una nueva Carpeta para temas propios, debe ser con un
+nombre totalmente diferente a los nombres que aparecen en estas Best Practices
+   Todo el detalle de cómo trabajar con estos elementos, para referenciarlos adecuadamente, usar sus Data Extensions asociadas, etc. Pueden encontrarse en el manual a continuación:
+https://drive.google.com/drive/folders/1aa8pClnrv9IxDAn1Gr97sLp75YJcMjbk ?usp=sharing
+  Manual componentes dinámicos para email
+  7
+
+   Nuevo logo Endesa (2025)
+Debe actualizarse allí donde se muestre el logo
+Como nos comparten desde Advertising (D.G. de Comunicación) el logo de Endesa ha cambiado y debe actualizarse allí donde se muestre.
+En este enlace pueden encontrarse los Brand Book actualizados al respecto (tanto a nivel corporación –Enel- como a nivel de Endesa). Así como de los assets para poder actualizarlo.
+Estos Assets también pueden encontrarse en Marketing Cloud, en Email Studio, en la ruta: Content Builder > 0 – LIBRARY > 0.4 – LOGOS > 01 – ML > Assets
+El nuevo logo es similar al previo, para ayudar a reconocer el logo actual correcto señalamos a continuación las diferencias con respecto al antiguo logo (en rojo sobre el antiguo logo, en verde sobre el nuevo). En resumen, lo degradados ya no funden a blanco en las letras, sino a azul sólido:
+LOGO ANTIGUO LOGO ACTUAL
+OWNERS
+        8
+
+  Cambios masivos en creatividades
+Evitar la creación excesiva de creatividades y usar AMPscript.
+Un número excesivo de creatividades por journey supone multiplicar el trabajo cuando el journey necesita un cambio, actualización o la empresa necesita cambiar el look&feel de sus creatividades (cambio de identidad corporativa, por ejemplo).
+Por ello, lo ideal es utilizar AMPscript y content blocks lo más posible, para poder actualizar los elementos fuera de las creatividades (en la Data Extensión, en el block, etc.) y que se propaguen los cambios a todas las creatividades que los llamen con AMPscript.
+No hacerlo no solo supone cambiar muchas más creatividades, sino tener que probar muchas más, lo que implica tiempo y coste.
+    Si los elementos que llama (p. ej. de una Data Extensión) cambian con frecuencia, puede ser mejor no llamarlos con AMPscript, para evitar que el cliente reciba información contradictoria, al ver estos cambios en su email al consultarlo en el futuro.
+9
+
+  RaiseError
+Función AMPscript que se debe usar únicamente con cautela
+Siempre que sea posible, antes de utilizar la función RaiseError para evitar/bloquear envíos, se deben valorar
+otras opciones (p. ej., un Split previo a la creatividad que lleve por otra rama del journey a aquellos que no se les vaya a enviar. Las alternativas a RaiseError se deben priorizar porque:
+• RaiseError supone una cancelación abrupta del envío, pero es poco ortodoxa,       por
+.
+• RaiseError permite registrar códigos de error/envío custom, pero si no se registran o consultan, se dan confusiones que pueden
+afectar a las pruebas/mantenimiento de esa comunicación, bloqueándose envíos sin identificarse el motivo.
+• RaiseError no evita la facturación del envío, es decir, el envío se cobra aunque no se realice, esto hace
+aún más necesaria la utilización de alternativas siempre que sea posible.
+• RaiseError, por defecto, considera como false la condición asociada, bloqueando envíos cuando carece de referencia.
+Lo que puede suponer cancelar más envíos de los deseados.
+RECORDATORIO: SE DEBE COMENTAR EL CÓDIGO AMPSCRIT
+Una máxima clave en programación que se debe seguir en general cuando se use AMPscript, y especialmente con funciones sensibles como RaiseError. Los comentarios son de gran ayuda tanto a integradores como al
+negocio, facilitando entender qué hace la creatividad, así como su mantenimiento y reutilización.
+ no saca al contacto del journey
+ defecto, por lo que se le sigue impactando
+con el resto de activities
+(trazabilidad, etc.) pese a que no
+ corresponda
+     10
+
+   Copias CC y BCC en activities Email
+Evitar usarlas
+No se recomienda usar las opciones de copia CC y BCC.
+Algunos de los motivos para no usarlas son:
+• Por seguridad: esos emails/buzones en copia recibirán todas las comunicaciones con los datos personales de los clientes. Es fácil olvidar que se ha configurado estos emails/buzones en copia y que queden eternamente enviando esta información personal, con el tiempo los encargados de estos emails/buzones pueden cambiar o incluso abandonar la compañía, exponiendo de forma peligrosa la información de estas comunicaciones personales.
+• Por costes: si ponemos emails/buzones en copia CC y BCC en los journeys se multiplican los envíos reales por tantos emails como se añadan, multiplicando los costes de envío (como mínimo duplicándolos tan pronto se añade un solo email/buzón).
+Alternativas:
+• Preview and Test: herramienta que permite el envío de una muestra con aspecto muy similar al de un email de producción.
+• Añadir un email/buzón entre los destinatarios del envío para recibir un/unos email/ls real/les de producción tras la activación del journey.
+• Si el envío es masivo, revisar los enlaces clicados de VAWP (se clican en un 0,1% de ocasiones, por eso es improbable que haya enlaces clicados en envíos pequeños) en Tracking Email puede permitir ver, en formato web, ejemplos de envíos reales.
+Evitar añadir emails aquí
+OWNERS
+     Configuración recomendada
+11
+
+  Actualización del código VML en emails para Outlook
+Cómo actualizar el código VML, para evitar errores en enlaces de botones en emails leídos con Outlook
+¿Por qué es importante?
+Aunque el código VML aparece comentado en HTML, Outlook lo renderiza directamente. No actualizarlo puede provocar que los botones y sus enlaces no funcionen correctamente para los destinatarios que usan Outlook.
+   Campos a actualizar
+href dentro del bloque VML
+Debe coincidir exactamente con la URL del botón en HTML. Si se actualiza el botón pero no el VML, Outlook enviará a una URL incorrecta.
+Texto del botón en <v:textbox>
+El texto visible dentro del bloque VML debe ser idéntico al del botón HTML. Outlook renderiza este texto, no el del HTML.
+   Esté botón de un email en inglés lleva a una url en catalán en un buzón de Outlook, porque la url está desactualizada en el código VML.
+Recomendaciones
+1. Hacer búsqueda global del <!—[if mso]> en el HTML para localizar todos los bloques VML del email
+2. Actualizar href y texto en cada bloque encontrado que corresponda a un botón, no solo en el primero
+3. Verificar en Outlook (o con Litmus/Email on Acid) antes de enviar
+4. Bloque VML por cada botón del email - cada CTA (botón) debería tener su propio bloque VML
+12
+
+   Subject y Preheader
+Asunto del email y texto de previsualización.
+Es fácil obviar, y sucede en algunas comunicaciones de los orígenes del uso de Marketing Cloud, proponer un preheader.
+Es habitual que negocio no lo tenga en cuenta, es fácil desconocerlo, pero es una buena práctica no dejarlo vacío, y consultar al negocio al respecto tan pronto se detecte su ausencia en la definición funcional de la comunicación. No rellenarlo manualmente lo rellenará automáticamente con el primer texto del contenido del email, poniendo a primer nivel textos no relevantes.
+Del mismo modo, si el subject (asunto) supera los 50 caracteres, debe avisarse al negocio de la alta probabilidad de que el cliente lo vea cortado, por si se desea sintetizarlo.
+Sender name
+¿Ves un subject y/o preheader incorrecto en tus envíos?
+Recuerda que aunque indiques Subject y Preheader en el email en Content Builder, debes también asegurarte que en el activity de email en el journey aparecen los mismos textos del email. Puedes tener estos campos desactualizados en el journey si estás trabajando/actualizando una nueva versión de un journey antiguo.
+Subject (asunto)
+Preheader
+OWNERS
+            13
+
+  Saludo inicial
+Código para garantizar que se muestra correctamente el Nombre o Razón social, según corresponda, en el saludo inicial del email
+OWNERS
+    Los emails suelen saludar al cliente al cliente de forma personalizada inicio del mismo. P. ej., Hola Fernando
+Para garantizar la presentación correcta del Nombre o Razón social, según corresponda a cada cliente, en este saludo, la solución más simple es disponer de ambos campos (Nombre y Apellido / Razón Social) en la Data Extension de envío. En caso de no disponer de los mismos en esta, se puede usar el siguiente código AMPscript en los saludos.
+UX (ATC) no recomienda usar el nombre completo (Nombre + Apellido) para dirigirnos a los clientes (Hola Francisco Javier Fernández Ballesteros) por ello con este código únicamente se mostrará el Nombre del cliente y, en caso de ser su Nombre un guion “-” (práctica habitual en personas jurídicas), se mostrará en su lugar el campo Apellido / Razón social (en adelante abreviado como Apellido).
+En síntesis, este código toma el Nombre o un su lugar (de ser el nombre un guion “-”) el Apellido de la Data Extension sincronizada Contact_Salesforce_10.
+XXXXX
+La parte indicada como XXXXX en el código se debe
+sustituir por el nombre el nombre del campo que contiene el Subscriber Key en la Data Extension de envío (p. ej. Subscriberkey, ContactID, etc). Según corresponda.
+CÓDIGO PARA AÑADIR EN EL SALUDO
+%%[
+SET @SubscriberKey = AttributeValue(”XXXXX")
+SET @Nombre = Lookup("ENT.Contact_Salesforce_10", "FirstName", "_Contactkey", @SubscriberKey) SET @Apellido = Lookup("ENT.Contact_Salesforce_10", "LastName", "_Contactkey", @SubscriberKey) ]%%
+Hola %%=IIF(@Nombre == "-", ProperCase(@Apellido), ProperCase(@Nombre))=%%
+ EJEMPLO 1
+EJEMPLO 2
+  Nombre Ana
+Apellido / Razón social García Pérez
+Nombre -
+Apellido / Razón social
+Limpiezas Brillante, Sl
+    Saludo en el email
+Saludo en el email
+   Pese a que no se recomienda en el saludo, se puede utilizar el mismo código, sustituyendo la parte en negrita del mismo, por el siguiente código, para mostrar ambos campos (Nombre + Apellido), conservando el resto del código y quitando el “Hola” si ya no se trata de un saludo. Entendemos que puede ser útil en otros apartados del email, más allá del saludo.
+Usando el siguiente código se mostrarán los dos campos (Nombre + Apellido) excepto en los casos en los que el el Nombre sea un guion “-”, en los que se mostraría únicamente el Apellido:
+%%[ IF @Nombre != "-" THEN ]%% %%=ProperCase(@Nombre)=%% %%[ ENDIF ]%% %%=ProperCase(@Apellido)=%%
+ 14
+ 
+   Header y Footer
+ EJEMPLO DE EMAIL
+EN MARKETING CLOUD
+OWNERS
+   El Header y el Footer son dos elementos esenciales que deben contener todo email construido.
+• Header: ofrece la posibilidad de ver el email en la web al cliente, debe situarse en la parte superior del email.
+• Footer: Contiene información de la empresa, enlaces de preferencias, bajas, privacidad (según el email, más información en la siguiente diapositiva) debe situarse en la parte inferior.
+Ambos elementos son estándares que ha confeccionado el integrador y no deben modificarse por el constructor.
+              15
+
+   Detalle del footer
+OWNERS
+   Existen tres tipos principales de footer que utilizar según la naturaleza de la comunicación/creatividad y :
+Transaccional: Con enlaces de Baja y Privacidad. No
+permite baja, pero contiene un hipervínculo llamado
+Baja que le indica al cliente cómo dejar de recibir esa
+comunicación, por qué la ha recibido, etc. Por ejemplo, explica al cliente que no puede darse de baja sin realizar otra acción (ej. sin darse de baja de factura digital) o que nunca más recibirá una comunicación como esa (ej. carta de despedida).
+Transaccional simple: Con enlace de Privacidad. Comercial: Con enlace de Preferencias, Baja y
+Privacidad.
+Como puede verse, los footers indican que no se conteste al email, si se necesita que el cliente conteste al mismo email recibido se debe trabajar otro footer con el integrador que permita esa posibilidad.
+TRANSACCIONAL (MF-T-ML-ES )
+EN MARKETING CLOUD
+Puede encontrarse más detalle respecto a los footers en el documento DOCMA - Solución Centro Preferencias Custom
+ TRANSACCIONAL SIMPLE (MF-TS-ML-ES )
+   COMERCIAL (MF-C-ML-ES)
+https://drive.google.com/d rive/folders/1M-c4Hy7jF- MDQqvND- TaodvD1kRF3EEB?usp=s haring
+Manual Centro de Preferencias
+     NOTA: se deben utilizar footers diferentes y específicos por cada idioma.
+16
+
+  Send Classification, Publication List y Footer (1/2)
+ Cuál usar en cada caso para garantizar un correcto funcionamiento (ML)
+Indicar correctamente Send Classification, Publication List y Footer es vital para respetar las preferencias de comunicación del cliente, así como para el correcto funcionamiento del enlace de baja.
+Las tablas a continuación indican la configuración adecuada para cada tipo de comunicación según la empresa, puede encontrarse más detalle técnico en el manual del Centro Preferencias de DOCMA DSI.
+¿Falla el enlace de baja en el footer de tus emails?
+Una Publication List errónea es probablemente la causa. Revisa que has seleccionado la adecuada para ese footer.
+           Tipo comunicación
+Publication List
+ Send Classification
+Footer
+Ejemplos
+Transaccional (únicamente factura digital)
+COM Factura Digital
+Transaccional Factura
+Transaccional
+Aviso de disponibilidad de factura digital
+Alertas de consumo
+COM Alertas
+Transaccional Notificaciones
+Transaccional
+Consumo alcanzado y Casa vacía.
+Encuestas
+All Subscribers
+Transaccional Encuestas
+Transaccional
+Encuestas Calidad
+Petición de documentación
+All Subscribers
+Transaccional Petición Documentación Endesa
+Transaccional
+Petición de documentación para formalización de la venta
+No aplica
+No aplica
+Comercial Notificaciones
+No aplica
+No aplica
+Transaccional (con guardado en GTB)
+All Subscribers
+Transaccional Notificaciones GTB
+Transaccional
+Carta inicio de gestiones
+Transaccional (resto)
+All Subscribers
+Transaccional Notificaciones
+Transaccional simple
+Baja autorizado
+Comercial (digitalización)
+COM Novedades Digitalización
+Comercial Digital
+Comercial
+Campañas de digitalización
+Revista ON
+COM Newsletter ON
+Comercial Venta y Fidelización
+Comercial
+Revista ON exclusivamente
+Comercial (resto)
+COM Asesoramiento comercial
+Comercial Venta y Fidelización
+Comercial
+Campañas comerciales
+No aplica
+COM Estado Contratación
+No aplica
+No aplica
+No aplica
+                           Manual Centro de preferencias
+https://drive.google.com/drive/folders/1M-c4Hy7jF-MDQqvND- TaodvD1kRF3EEB?usp=sharing
+17
+  
+ Send Classification, Publication List y Footer (2/2)
+Cuál usar en cada caso para garantizar un correcto funcionamiento (MR)
+          Tipo comunicación
+ Publication List
+ Send Classification
+ Footer
+ Ejemplos
+ Transaccional (únicamente factura digital)
+MR_COM Factura Digital
+Transaccional Factura Energia XXI
+Transaccional
+Aviso de disponibilidad de factura digital
+Alertas de consumo
+MR_COM Alertas
+Transaccional Notificaciones Energia XXI
+Transaccional
+Consumo alcanzado y Casa vacía.
+Encuestas
+All Subscribers
+Transaccional Encuestas Energia XXI
+Transaccional
+Encuestas Calidad
+Petición de documentación
+All Subscribers
+Transaccional Petición Documentación Energia XXI
+Transaccional
+Petición de documentación para formalización de la venta
+No aplica
+No aplica
+Comercial Notificaciones Energia XXI
+No aplica
+No aplica
+Transaccional (con guardado en GTB)
+All Subscribers
+Transaccional Notificaciones GTB Energia XXI
+Transaccional
+Carta inicio de gestiones
+Transaccional (resto)
+All Subscribers
+Transaccional Notificaciones Energia XXI
+Transaccional simple
+Baja autorizado
+Comercial (digitalización)
+MR_COM Novedades Digitalización
+Comercial Digital Energia XXI
+Comercial
+Campañas de digitalización
+No aplica
+MR_COM Estado Contratación
+No aplica
+No aplica
+No aplica
+                    18
+
+   Leads – Creación y footer (1/2)
+OWNERS
+   CREACIÓN DE LEADS DESDE MARKETING CLOUD
+Actualmente, los leads que no existan en COSMOS, pero se les necesite enviar una comunicación desde Marketing Cloud, pueden crearse en COSMOS desde Marketing Cloud, con un journey específico de esa comunicación que gestione la creación de estos leads.
+Este journey debe usar Create Lead Activity y Update Contact en combinación para los casos de leads que todavía no existan en COSMOS.
+De esta forma se pueden crear los leads en COSMOS con su ID adecuado (00Q...) para su uso en el journey de envío de la comunicación.
+Ejemplos útiles de journeys de creación de leads en producción:
+• S009199_RyN_CAM_CAP_ML_Nurturing.Alwa ys.On-ML_CreateLeads
+• S009993_RyN_CAM_CAP_ML_Arbol.de.Fugas .Tarifa.Conecta-ML_CreateLeads
+Más información sobre cómo obtener estos Attibute Values: https://help.salesforce.com/s/articleView?id=000390236&type=1
+       19
+
+  Leads – Creación y footer (2/2)
+OWNERS
+   FOOTER COMERCIAL FUNCIONAL PARA LEADS (con Bajas y Preferencias funcionando)
+No existe una solución completamente funcional en la actualidad. Como con el resto de contactos, en la actualidad se usa el footer COMERCIAL (MF- C-ML-ES/CA/EN) para comunicaciones comerciales destinadas a leads. Pero si se usa este footer sin más, el enlace de Preferencias de los leads no funciona correctamente.
+En el caso de Always On (S009199), única comunicación con un footer comercial plenamente funcional para leads (en el que incluso funciona Preferencias), la solución de contingencia supuso:
+• Añadir una variable en la propia landing de Preferencias para que distinguiese que era un lead de ese journey y se pudiese mostrar correctamente.
+• Añadir una landing page de preferencias específica para lead.
+Editar la landing de Preferencias para cada comunicación es poco práctico
+y arriesgado (y requiere supervisión de DSI, owner de este desarrollo).
+DOCMA DNT ha solicitado valoración para la creación de footers funcionales para leads de uso sencillo.
+Landing del centro de preferencias, modificada para que funcione el enlace de Preferencias en los emails de Always On (S009199).
+ Segunda landing del centro de preferencias pensada para que funcione el enlace de Preferencias en los emails de Always On (S009199).
+20
+
+   Modo oscuro/noche - Imágenes
+Garantizar visualización
+Cuando los emails se ven en dispositivos con modo oscuro, pueden ver sus colores cambiados/invertidos. Por esto, es importante seguir directrices como los colores accesibles, mencionados anteriormente.
+En el caso de las imágenes, estas no ven cambiados sus colores en modo oscuro, por lo que es importante tener especial cuidado con ellas si son oscuras, pues pueden perder su contraste y confundirse con el fondo.
+¿Cómo evitar esta situación? Hay varias maneras de solventarlo, según la creatividad y experiencia del constructor. Un ejemplo de cómo solventar estas situaciones es, por ejemplo, añadir un contorno/trazo blanco en torno a la imagen en cuestión. De esta manera, en modo claro/día sería imperceptible, y en modo oscuro/noche la imagen contrastaría con el fondo gracias a este contorno. lustramos a continuación.
+OWNERS
+   VISUALIZACIÓN EN MODO CLARO
+VISUALIZACIÓN EN MODO OSCURO
+          Ejemplo real de un email en modo oscuro. El icono de la llama de gas apenas es perceptible.
+IMAGEN SIN ADAPTAR PARA MODO OSCURO
+IMAGEN
+ADAPTADA
+PARA MODO OSCURO
+ 21
+
+  Evitar deformación por ancho - Imágenes
+Garantizar visualización
+Algunos proveedores de email mostrarán los emails deformados a los clientes si alguna de sus imágenes supera el ancho del email,
+normalmente 600px.
+Pese a que Email Studio tenga opciones para ajustar el tamaño de la imagen (Dimensions) y opciones como Scale to fit, algunos clientes
+podrían recibir de todas formas las imágenes en su tamaño superior al ancho, deformándose la totalidad del email.
+Por todo esto, se debe evitar usar imágenes que superen el ancho del email (600px). Así se garantiza no sufrir una alteración del look & feel de los emails enviados por esta causa.
+ EMAIL CON IMAGEN DE CABECERA DE 600PX O MENOS
+MISMO EMAIL CON IMAGEN DE CABECERA DE ANCHO SUPERIOR A 600PX
+  22
+
+   Texto alternativo – Alt Text
+Las imágenes de los emails necesitan un texto alternativo.
+Cuando no pueden mostrarse correctamente las imágenes (o para clientes invidentes) deben disponer de un texto alternativo (Alt Text) que mostrar.
+El texto no debe describir la imagen: “Mano agarrando un móvil sobre un escritorio”.
+El texto de la foto de cabecera debe ser el mismo que el del asunto del email, según se indica desde Usabilidad (ATC).
+El texto de otras fotos/imágenes del email debe cumplir una función similar, con un titular que sintetice la idea principal que acompaña a la imagen. P. ej., en un cierre de digitalización, el alt de la foto ilustrativa podría ser “Descarga la app”.
+NOTA: se indica que es preferible no poner personalización (AMPscript) en este apartado, o si se pone, indicarlo de alguna forma para tenerlo en cuenta en caso de la detección de errores, pues es fácil olvidar que esa personalización se encuentra en este campo oculto. Se marcará expresamente en las fichas de las Comunicaciones de COSMOS.
+OWNERS
+        23
+
+   Tracking Alias (1/9)
+La ratio CTR (clics sobre emails entregados) se debe medir de la forma más precisa posible diferenciando el tipo de clics dentro de una comunicación para calcular el ratio adecuado.
+Una comunicación tiene diferentes enlaces que pueden estar relacionados con el objetivo de la comunicación (CTA’s) o pueden ser de naturaleza más operativa con los enlaces de baja, privacidad, etc.
+Actualmente, en los informes por defecto de comunicaciones de SFMC el cálculo del indicador CTR (clics sobre emails entregados) se realiza sobre la totalidad de los clics realizado en la comunicación.
+Es necesario poder diferenciar los distintos enlaces de una comunicación para realizar una medición del CTR sobre los enlaces relacionados con los CTA’s.
+OWNERS
+     Diferentes enlaces en una comunicación de email 24
+
+  Tracking Alias (2/9)
+Por ello, al realizar una comunicación, se deben etiquetar correctamente los links para poder medir los CTA ́s de la manera precisa requerida.
+Pasos realizados:
+1. Identificar los principales distintos enlaces que puede haber en una comunicación
+2. Establecer una nomenclatura global del nombre de los enlaces
+3. Determinar qué enlaces queremos medir para calcular el CTR.
+El cálculo del indicador del CTR se realizará sobre los enlaces denominados CTA1 (según la nomenclatura propuesta a continuación)
+OWNERS
+     Esto se debe tener en cuenta en todos los nuevos journeys que se creen, indicándolo en el campo Tracking Alias.
+ 25
+
+  Tracking Alias. Objetivo primario (CTA1) (3/9)
+El etiquetado correcto a seguir en los enlaces que deben contar para el CTR (CTA1) es el siguiente.
+OWNERS
+     Enlaces de llamada a la acción – CTA ́s
+Link Name (Tracking Alias)
+ Objetivo primario
+Enlaces relativos al objetivo principal de la comunicación
+CTA1
+ 1
+2
+    NOTAS:
+• Una comunicación puede tener dos
+CTA1 (como en el ejemplo 2).
+• El enlace CTA va generalmente a través
+de un botón dentro de los emails.
+• Podrían ponerse apellidos, pej en el
+caso 1 podría ser: CTA1-CITAPREVIA a decisión del owner y siempre poniendo delante CTA1.
+• Los clics en el CTA1 son los que deben contar para la ratio del CTR.
+ 26
+
+  OWNERS
+Tracking Alias. Objetivo secundario (CTA2) (4/9)
+Los links asociados a objetivos secundarios también deben seguir unas directrices de etiquetado (CTA2).
+1
+      Enlaces de llamada a la acción – CTA ́s
+Link Name (Tracking Alias)
+ Objetivos secundarios
+Enlaces no operativos en una comunicación con un objetivo distinto al principal, por ejemplo, informativo para que el usuario/cliente realice una encuesta o active la factura digital
+CTA2
+      NOTAS:
+• Se podría dejar solo como CTA2, pero
+también se podría poner un apellido (a decisión del owner), sería seguido de un guión medio, así: CTA2-apellido.
+• En el caso1 se podría poner CTA2-PDS y CTA2-TFNO, por ejemplo.
+• Si hay objetivos secundarios recurrentes se recomienda seguir siempre un mismo etiquetado (a decidir por el owner, área responsable de la comunicación).
+ 27
+
+  Tracking Alias. Objetivo secundario. Casos recurrentes (5/9) Hay ciertos componentes que pueden ponerse de forma habitual como objetivo secundario en
+ciertas comunicaciones. En estos casos se debe seguir un etiquetado más específico (CTA2-APELLIDO).
+OWNERS
+     CTA2-CAPTACIONWHATSAPP
+Faldón de WhatsApp para recabar consentimiento en una comunicación con otro objetivo principal.
+CTA2-DIG
+Cierre de Digitalizacion en una com
+ 28
+
+  Tracking Alias. Enlaces operativos (6/9)
+Dentro de un email también hay enlaces operativos que deben ser etiquetados para poder
+distinguir claramente los clics en los mismos.
+OWNERS
+          Enlaces Operativos
+ Link Name
+(Tracking Alias)
+Ver
+Si no puedes ver correctamente pulsa aquí (está al principio del email). Enlace que abre la comunicación en el explorador
+VAWP
+Bajas
+Enlace para solicitar las bajas de la comunicación
+unsubscribe-link
+Centro preferencias
+Enlace al centro de preferencias
+preferences-link
+Privacidad
+Enlace privacidad (o aviso legal)
+privacity-link
+logo
+Enlace al logo correspondiente
+endesa-link
+Firma
+Enlace a Endesa Energía o Energía XXI según corresponda
+endesa.signature-link
+          NOTAS:
+• Estos componentes son bloques de
+contenidos ya predefinidos que ya vienen etiquetados.
+ 29
+
+  Tracking Alias. Encuestas (7/9)
+En el caso particular de encuestas además se deben poner apellidos específicos, tanto en si es
+ objetivo primario como secundario.
+OWNERS
+       Objetivo primario
+CTA1-ENC
+1
+2
+3
+   NOTAS:
+• Sí se quiere aprovechar para identificar el resultado de la encuesta, como en el ejemplo 1, podría aprovecharse para poner un segundo apellido
+como. CTA1-ENC_SI, CTA1-ENC_NO, CTA1-ENC_DUDA ( a decisión del owner) y en CTA2-ENC_SI y CTA2-ENC_NO
+30
+Objetivo secundario
+CTA2-ENC
+ 
+  Tracking Alias. Idiomas (8/9)
+Si se quisieran distinguir idiomas se puede poner un apellido al final del etiquetado con la siguiente nomenclatura, tanto en el CTA primario como secundario.
+OWNERS
+       _ES _CA _EN
+CTA1_ES
+CTA1_EN
+1
+2
+3
+             NOTAS:
+• También podría ponerse en el secundario, incluso en alguno
+CTA1_CA
+específico, pej: CTA1-ENC_NO_EN , siempre al final
+31
+
+ Tracking Alias. Resumen (9/9)
+Se resume el etiquetado correcto a seguir descrita con más detalle en slides previas.
+OWNERS
+  
+Enlaces de llamada a la acción –
+CTA ́s
+Link Name
+(Tracking Alias)
+Objetivo primario
+Enlaces relativos al objetivo principal de la comunicación
+CTA1
+Objetivos secundarios
+Enlaces no operativos en una comunicación con un objetivo distinto al principal, por ejemplo, informativo para que usuario realice una encuesta o active la factura digital
+CTA2
+Encuestas
+Link Name
+(Tracking Alias)
+Objetivo primario
+En comunicaciones que son encuestas.
+CTA1-ENC
+Objetivos secundarios
+Encuesta incrustada en una comunicación con otro objetivo principal.
+CTA2-ENC
+Objetivos secundarios recurrentes
+Link Name
+(Tracking Alias)
+Ver
+Faldón de Digitalización en una comunicación con otro objetivo principal.
+CTA2-DIG
+Bajas
+Faldón de WhatsApp para recabar consentimiento en una comunicación con otro objetivo principal.
+CTA2-CAPTACIONWHATSAPP
+Enlaces Operativos
+Link Name
+(Tracking Alias)
+Ver
+Si no puedes ver correctamente pulsa aquí (está al principio del email). Enlace que abre la comunicación en el explorador
+VAWP
+Bajas
+Enlace para solicitar las bajas de la comunicación
+unsubscribe-link
+Centro preferencias
+Enlace al centro de preferencias
+preferences-link
+Privacidad
+Enlace privacidad (o aviso legal)
+privacity-link
+logo
+Enlace al logo correspondiente
+endesa-link
+Firma
+Enlace a Endesa Energía o Energía XXI según corresponda
+endesa.signature-link
+Idiomas (Opcional)
+Link Name
+(Tracking Alias)
+Español
+Apellidos que van a continuación de cualquier link name si se quiere luego realizar un seguimiento por idiomas.
+_ES (apellido al final)
+Catalán
+_CA (apellido al final)
+Inglés
+_EN (apellido al final)
+32`;
+
+        const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
+
+        const fetchWithRetry = async (url, options, retries = 5) => {
+            const delays = [1000, 2000, 4000, 8000, 16000];
+            for (let i = 0; i < retries; i++) {
+                try {
+                const response = await fetch(url, options);
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                return await response.json();
+                } catch (error) {
+                if (i === retries - 1) throw error;
+                await delay(delays[i]);
+                }
+            }
+        };
+
+        function App() {
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [passwordInput, setPasswordInput] = useState('');
+            const [authError, setAuthError] = useState('');
+
+            // Estados del Chat
+            const [messages, setMessages] = useState([
+                { role: 'assistant', content: '¡Hola! Soy tu asistente de Best Practices DOCMA. ¿En qué te puedo ayudar hoy sobre Marketing Cloud?' }
+            ]);
+            const [inputMessage, setInputMessage] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const messagesEndRef = useRef(null);
+
+            // Auto-scroll al último mensaje
+            const scrollToBottom = () => {
+                messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            };
+            useEffect(() => {
+                scrollToBottom();
+            }, [messages]);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (passwordInput === 'docma123') {
+                setIsAuthenticated(true);
+                setAuthError('');
+                } else {
+                setAuthError('Contraseña incorrecta. Por favor, inténtalo de nuevo.');
+                }
+            };
+
+            const handleSendMessage = async (e) => {
+                e.preventDefault();
+                if (!inputMessage.trim()) return;
+
+                const userMsg = inputMessage.trim();
+                setInputMessage('');
+                setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+                setIsLoading(true);
+
+                try {
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+                
+                // Construir el historial para Gemini
+                const formattedHistory = messages.map(msg => ({
+                    role: msg.role === 'assistant' ? 'model' : 'user',
+                    parts: [{ text: msg.content }]
+                }));
+                
+                // Añadir el mensaje actual
+                formattedHistory.push({
+                    role: 'user',
+                    parts: [{ text: userMsg }]
+                });
+
+                const payload = {
+                    contents: formattedHistory,
+                    systemInstruction: {
+                    parts: [{ 
+                        text: `Eres un asistente virtual experto en "Best Practices DOCMA" para envíos de comunicaciones en Salesforce Marketing Cloud.
+                        
+                        REGLAS ESTRICTAS:
+                        1. Responde a las dudas del usuario basándote ÚNICAMENTE Y EXCLUSIVAMENTE en el texto proporcionado en la sección "DOCUMENTOS DE REFERENCIA".
+                        2. Si la respuesta a la pregunta no está en los "DOCUMENTOS DE REFERENCIA", debes responder educadamente que no tienes información sobre ese tema específico en tus manuales de DOCMA.
+                        3. Mantén un tono profesional, claro, directo y de ayuda constante.
+                        4. Usa un formato limpio (puedes usar listas o negritas si ayuda a la claridad).
+
+                        DOCUMENTOS DE REFERENCIA (Base de conocimientos):
+                        ${DOCUMENT_CONTENT}` 
+                    }]
+                    }
+                };
+
+                const result = await fetchWithRetry(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const aiResponse = result.candidates?.[0]?.content?.parts?.[0]?.text;
+                
+                if (aiResponse) {
+                    setMessages(prev => [...prev, { role: 'assistant', content: aiResponse }]);
+                } else {
+                    throw new Error("Respuesta vacía de la API");
+                }
+
+                } catch (error) {
+                setMessages(prev => [...prev, { 
+                    role: 'assistant', 
+                    content: 'Lo siento, ha ocurrido un error de conexión al consultar los documentos. Por favor, inténtalo de nuevo.' 
+                }]);
+                } finally {
+                setIsLoading(false);
+                }
+            };
+
+            if (!isAuthenticated) {
+                return (
+                <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
+                    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+                    <div className="bg-blue-600 p-8 text-center">
+                        <IconBookOpen />
+                        <h1 className="text-2xl font-bold text-white mb-2">Portal DOCMA</h1>
+                        <p className="text-blue-100">Best Practices Marketing Cloud</p>
+                    </div>
+                    
+                    <div className="p-8">
+                        <form onSubmit={handleLogin} className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">
+                            Contraseña de Acceso
+                            </label>
+                            <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <IconLock />
+                            </div>
+                            <input
+                                type="password"
+                                value={passwordInput}
+                                onChange={(e) => setPasswordInput(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="Introduce la contraseña..."
+                                autoFocus
+                            />
+                            </div>
+                            {authError && (
+                            <div className="mt-3 flex items-center text-sm text-red-600">
+                                <IconAlert />
+                                {authError}
+                            </div>
+                            )}
+                        </div>
+                        
+                        <button
+                            type="submit"
+                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                        >
+                            Acceder al Asistente
+                        </button>
+                        </form>
+                    </div>
+                    </div>
+                    <p className="mt-8 text-sm text-slate-400 text-center">
+                    Acceso restringido para el equipo de comunicaciones DOCMA.
+                    </p>
+                </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+                <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+                    <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <div className="bg-blue-100 p-2 rounded-lg">
+                        <IconMessage />
+                        </div>
+                        <div>
+                        <h1 className="font-bold text-slate-800">DOCMA Asistente AI</h1>
+                        <p className="text-xs text-slate-500">Marketing Cloud Best Practices</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => setIsAuthenticated(false)}
+                        className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+                    >
+                        Cerrar sesión
+                    </button>
+                    </div>
+                </header>
+
+                <main className="flex-1 w-full max-w-5xl mx-auto p-4 flex flex-col h-[calc(100vh-8rem)]">
+                    <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    
+                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                        {messages.map((msg, index) => (
+                        <div 
+                            key={index} 
+                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div 
+                            className={`max-w-[80%] rounded-2xl p-4 ${
+                                msg.role === 'user' 
+                                ? 'bg-blue-600 text-white rounded-br-none' 
+                                : 'bg-slate-100 text-slate-800 rounded-bl-none'
+                            }`}
+                            >
+                            <div className="prose prose-sm max-w-none whitespace-pre-wrap">
+                                {msg.content}
+                            </div>
+                            </div>
+                        </div>
+                        ))}
+                        
+                        {isLoading && (
+                        <div className="flex justify-start">
+                            <div className="bg-slate-100 rounded-2xl rounded-bl-none p-4 flex items-center space-x-2 text-slate-500">
+                            <IconLoader />
+                            <span className="text-sm font-medium">Buscando en la base de conocimientos...</span>
+                            </div>
+                        </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    <div className="p-4 bg-white border-t border-slate-100">
+                        <form onSubmit={handleSendMessage} className="flex space-x-3">
+                        <input
+                            type="text"
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder="Ej: ¿Cuál es la longitud máxima para un asunto?"
+                            className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                            disabled={isLoading}
+                        />
+                        <button
+                            type="submit"
+                            disabled={isLoading || !inputMessage.trim()}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-full p-3 w-12 h-12 flex items-center justify-center transition-colors shadow-sm"
+                        >
+                            <IconSend />
+                        </button>
+                        </form>
+                        <div className="text-center mt-2">
+                        <span className="text-xs text-slate-400">
+                            Basado exclusivamente en los documentos internos proporcionados.
+                        </span>
+                        </div>
+                    </div>
+                    
+                    </div>
+                </main>
+                </div>
+            );
+        }
+
+        const rootElement = document.getElementById('root');
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+    </script>
+</body>
+</html>
