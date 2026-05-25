@@ -5,21 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal DOCMA AI</title>
     
-    <!-- Carga de Tailwind CSS para estilos -->
     <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Carga de React y ReactDOM -->
     <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
     <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    
-    <!-- Carga de Babel para compilar JSX en el navegador -->
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
 
-    <!-- Carga de Iconos (Lucide) -->
-    <script src="https://unpkg.com/lucide@latest"></script>
-
     <style>
-        /* Pequeño ajuste para asegurar que el body ocupe todo el alto */
         body, html { height: 100%; margin: 0; }
         #root { height: 100%; }
     </style>
@@ -27,44 +18,285 @@
 <body>
     <div id="root"></div>
 
-    <!-- El script principal con tipo text/babel para que Babel lo procese -->
     <script type="text/babel">
-        // Extraemos Hooks de React
         const { useState, useRef, useEffect } = React;
+        
+        // 🔑 API Key configurada internamente
+        const INTERNAL_API_KEY = "AIzaSyD2Z-5R_xySyP37PZi4Vs3Nvo3LPVqATKk";
 
-        // Definimos los iconos SVG de forma inline ya que no usamos el paquete npm lucide-react directamente
-        const IconBookOpen = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-16 h-16 text-white mx-auto mb-4"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
-        );
-        const IconLock = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-5 w-5 text-slate-400"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-        );
-        const IconAlert = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4 mr-1"><circle cx="12" cy="12" r="10"/><line x1="12" x2="12" y1="8" y2="12"/><line x1="12" x2="12.01" y1="16" y2="16"/></svg>
-        );
-        const IconMessage = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-6 h-6 text-blue-600"><path d="m3 21 1.9-5.7a8.5 8.5 0 1 1 3.8 3.8z"/></svg>
-        );
-        const IconSend = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 ml-1"><path d="m22 2-7 20-4-9-9-4Z"/><path d="M22 2 11 13"/></svg>
-        );
-        const IconLoader = () => (
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-5 h-5 animate-spin"><line x1="12" x2="12" y1="2" y2="6"/><line x1="12" x2="12" y1="18" y2="22"/><line x1="4.93" x2="7.76" y1="4.93" y2="7.76"/><line x1="16.24" x2="19.07" y1="16.24" y2="19.07"/><line x1="2" x2="6" y1="12" y2="12"/><line x1="18" x2="22" y1="12" y2="12"/><line x1="4.93" x2="7.76" y1="19.07" y2="16.24"/><line x1="16.24" x2="19.07" y1="7.76" y2="4.93"/></svg>
-        );
+        // Aquí iría tu base de conocimientos (la que ya tenías)
+        const DOCUMENT_CONTENT = `[PEGA AQUÍ TU DOCUMENTACIÓN DE DOCMA]`;
 
-        const apiKey = "AIzaSyD2Z-5R_xySyP37PZi4Vs3Nvo3LPVqATKk"; // La clave se inyectará automáticamente en el entorno
+        function App() {
+            const [isAuthenticated, setIsAuthenticated] = useState(false);
+            const [passwordInput, setPasswordInput] = useState('');
+            const [authError, setAuthError] = useState('');
+            const [messages, setMessages] = useState([
+                { role: 'assistant', content: '¡Hola! Soy tu asistente de Best Practices DOCMA. ¿En qué te puedo ayudar hoy?' }
+            ]);
+            const [inputMessage, setInputMessage] = useState('');
+            const [isLoading, setIsLoading] = useState(false);
+            const messagesEndRef = useRef(null);
 
-        const DOCUMENT_CONTENT = `4.2 Creación de Emails
-  
-• Accede a los diferentes contenidos
-• Nombre de las creatividades email
-• Plantillas responsive
-• Duplicar/reutilizar creatividades
-• Colores accesibles
-• Componentes dinámicos de uso general
-• Nuevo logo Endesa (2025)
-• Cambios masivos en creatividades
-• RaiseError
+            const scrollToBottom = () => messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+            useEffect(() => scrollToBottom(), [messages]);
+
+            const handleLogin = (e) => {
+                e.preventDefault();
+                if (passwordInput === 'docma123') {
+                    setIsAuthenticated(true);
+                } else {
+                    setAuthError('Contraseña incorrecta.');
+                }
+            };
+
+            const handleSendMessage = async (e) => {
+                e.preventDefault();
+                if (!inputMessage.trim()) return;
+
+                const userMsg = inputMessage.trim();
+                setInputMessage('');
+                setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+                setIsLoading(true);
+
+                try {
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${INTERNAL_API_KEY}`;
+                    
+                    const formattedHistory = messages.map(msg => ({
+                        role: msg.role === 'assistant' ? 'model' : 'user',
+                        parts: [{ text: msg.content }]
+                    }));
+                    formattedHistory.push({ role: 'user', parts: [{ text: userMsg }] });
+
+                    const response = await fetch(url, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            contents: formattedHistory,
+                            systemInstruction: { parts: [{ text: "Eres un asistente de DOCMA. Responde basándote exclusivamente en: " + DOCUMENT_CONTENT }] }
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    const aiResponse = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                    setMessages(prev => [...prev, { role: 'assistant', content: aiResponse || "No pude procesar la consulta." }]);
+                } catch (error) {
+                    setMessages(prev => [...prev, { role: 'assistant', content: 'Error de conexión.' }]);
+                } finally {
+                    setIsLoading(false);
+                }
+            };
+
+            if (!isAuthenticated) {
+                return (
+                    <div className="min-h-screen bg-slate-50 flex items-center justify-center p-4">
+                        <form onSubmit={handleLogin} className="bg-white p-8 rounded-2xl shadow-xl w-full max-w-sm">
+                            <h1 className="text-2xl font-bold text-blue-600 mb-6 text-center">Portal DOCMA</h1>
+                            <input type="password" value={passwordInput} onChange={(e) => setPasswordInput(e.target.value)} className="w-full p-3 border rounded-lg mb-4" placeholder="Contraseña..." />
+                            {authError && <p className="text-red-500 text-sm mb-4">{authError}</p>}
+                            <button type="submit" className="w-full bg-blue-600 text-white p-3 rounded-lg font-bold">Acceder</button>
+                        </form>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col p-4">
+                    <div className="max-w-3xl mx-auto w-full flex-1 flex flex-col bg-white shadow-lg rounded-2xl overflow-hidden">
+                        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+                            {messages.map((m, i) => (
+                                <div key={i} className={`p-4 rounded-xl ${m.role === 'user' ? 'bg-blue-600 text-white ml-auto' : 'bg-slate-100'}`}>{m.content}</div>
+                            ))}
+                            <div ref={messagesEndRef} />
+                        </div>
+                        <form onSubmit={handleSendMessage} className="p-4 border-t flex gap-2">
+                            <input value={inputMessage} onChange={(e) => setInputMessage(e.target.value)} className="flex-1 p-3 border rounded-full" placeholder="Escribe tu duda..." />
+                            <button type="submit" className="bg-blue-600 text-white px-6 rounded-full font-bold">Enviar</button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>                } else {
+                    throw new Error("Respuesta vacía de la API");
+                }
+
+                } catch (error) {
+                setMessages(prev => [...prev, { 
+                    role: 'assistant', 
+                    content: 'Lo siento, ha ocurrido un error de conexión al consultar los documentos. Por favor, inténtalo de nuevo.' 
+                }]);
+                } finally {
+                setIsLoading(false);
+                }
+            };
+
+            if (!isAuthenticated) {
+                return (
+                <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center p-4">
+                    <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden border border-slate-100">
+                    <div className="bg-blue-600 p-8 text-center">
+                        <IconBookOpen />
+                        <h1 className="text-2xl font-bold text-white mb-2">Portal DOCMA</h1>
+                        <p className="text-blue-100">Configuración de Acceso</p>
+                    </div>
+                    
+                    <div className="p-8">
+                        <form onSubmit={handleLogin} className="space-y-6">
+                        {/* Contraseña */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Contraseña de Acceso</label>
+                            <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <IconLock />
+                            </div>
+                            <input
+                                type="password"
+                                value={passwordInput}
+                                onChange={(e) => setPasswordInput(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="Introduce la contraseña..."
+                                required
+                            />
+                            </div>
+                        </div>
+
+                        {/* API Key */}
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Gemini API Key</label>
+                            <div className="relative">
+                            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <IconKey />
+                            </div>
+                            <input
+                                type="password"
+                                value={apiKeyInput}
+                                onChange={(e) => setApiKeyInput(e.target.value)}
+                                className="block w-full pl-10 pr-3 py-3 border border-slate-300 rounded-lg focus:ring-blue-500 focus:border-blue-500 transition-colors"
+                                placeholder="Introduce tu API Key..."
+                                required
+                            />
+                            </div>
+                        </div>
+                        
+                        {authError && (
+                            <div className="flex items-center text-sm text-red-600">
+                                <IconAlert />
+                                {authError}
+                            </div>
+                        )}
+                        
+                        <button
+                            type="submit"
+                            className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                        >
+                            Acceder al Asistente
+                        </button>
+                        </form>
+                    </div>
+                    </div>
+                </div>
+                );
+            }
+
+            return (
+                <div className="min-h-screen bg-slate-50 flex flex-col font-sans">
+                <header className="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+                    <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                        <div className="bg-blue-100 p-2 rounded-lg">
+                        <IconMessage />
+                        </div>
+                        <div>
+                        <h1 className="font-bold text-slate-800">DOCMA Asistente AI</h1>
+                        <p className="text-xs text-slate-500">Marketing Cloud Best Practices</p>
+                        </div>
+                    </div>
+                    <button 
+                        onClick={() => setIsAuthenticated(false)}
+                        className="text-sm text-slate-500 hover:text-slate-800 transition-colors"
+                    >
+                        Cerrar sesión
+                    </button>
+                    </div>
+                </header>
+
+                <main className="flex-1 w-full max-w-5xl mx-auto p-4 flex flex-col h-[calc(100vh-8rem)]">
+                    <div className="flex-1 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                    
+                    <div className="flex-1 overflow-y-auto p-6 space-y-6">
+                        {messages.map((msg, index) => (
+                        <div 
+                            key={index} 
+                            className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                        >
+                            <div 
+                            className={`max-w-[80%] rounded-2xl p-4 ${
+                                msg.role === 'user' 
+                                ? 'bg-blue-600 text-white rounded-br-none' 
+                                : 'bg-slate-100 text-slate-800 rounded-bl-none'
+                            }`}
+                            >
+                            <div className="prose prose-sm max-w-none whitespace-pre-wrap">
+                                {msg.content}
+                            </div>
+                            </div>
+                        </div>
+                        ))}
+                        
+                        {isLoading && (
+                        <div className="flex justify-start">
+                            <div className="bg-slate-100 rounded-2xl rounded-bl-none p-4 flex items-center space-x-2 text-slate-500">
+                            <IconLoader />
+                            <span className="text-sm font-medium">Buscando en la base de conocimientos...</span>
+                            </div>
+                        </div>
+                        )}
+                        <div ref={messagesEndRef} />
+                    </div>
+
+                    <div className="p-4 bg-white border-t border-slate-100">
+                        <form onSubmit={handleSendMessage} className="flex space-x-3">
+                        <input
+                            type="text"
+                            value={inputMessage}
+                            onChange={(e) => setInputMessage(e.target.value)}
+                            placeholder="Ej: ¿Cuál es la longitud máxima para un asunto?"
+                            className="flex-1 bg-slate-50 border border-slate-200 rounded-full px-6 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                            disabled={isLoading}
+                        />
+                        <button
+                            type="submit"
+                            disabled={isLoading || !inputMessage.trim()}
+                            className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-300 text-white rounded-full p-3 w-12 h-12 flex items-center justify-center transition-colors shadow-sm"
+                        >
+                            <IconSend />
+                        </button>
+                        </form>
+                        <div className="text-center mt-2">
+                        <span className="text-xs text-slate-400">
+                            Basado exclusivamente en los documentos internos proporcionados.
+                        </span>
+                        </div>
+                    </div>
+                    
+                    </div>
+                </main>
+                </div>
+            );
+        }
+
+        const rootElement = document.getElementById('root');
+        const root = ReactDOM.createRoot(rootElement);
+        root.render(<App />);
+    </script>
+</body>
+</html>• RaiseError
 • Copias CC y BCC en activities Email
 • Actualización del código VML en emails para Outlook
 • Subject y Preheader
